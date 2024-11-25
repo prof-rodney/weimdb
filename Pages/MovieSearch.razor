@@ -1,0 +1,44 @@
+@page "/movies"
+@inject webimdb.Services.MovieService MovieService
+
+<h3>Pesquisando Filmes</h3>
+
+<div class="input-group mb-3">
+    <input type="text" class="form-control" @bind="searchTerm" placeholder="Digite o título do filme...">
+    <button class="btn btn-primary" @onclick="SearchMovie">Pesquisar</button>
+</div>
+
+@if(isLoading)
+{
+    <p>Carregando os dados dados IMDB...</p>
+}
+else if(movie != null)
+{
+    <div class="card">
+        <img src="@movie.Poster" class="card-img-top" alt="Poster">
+        <div class="card-body">
+            <h5 class="card-title">@movie.Title</h5>
+            <p class="card-text"><strong>Elenco: </strong>@movie.Actors</p>
+            <p class="card-text"><strong>Sinopse: </strong>@movie.Plot</p>
+        </div>
+    </div>
+}
+else if(isSearched)
+{
+    <p>Nenhum filme foi encontrado com esse título.</p>
+}
+
+@code{
+    private string searchTerm = string.Empty;
+    private webimdb.Models.Movie? movie;
+    private bool isLoading = false;
+    private bool isSearched = false;
+
+    private async Task SearchMovie()
+    {
+        isLoading = true;
+        movie = await MovieService.GetMovieAsync(searchTerm, "movie");
+        isSearched = true;
+        isLoading = false;
+    }
+}
